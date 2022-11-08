@@ -29,7 +29,12 @@ class CleaningModel(mesa.Model):
             self.grid.place_agent(a, (x, y))
 
         self.datacollector = mesa.DataCollector(
-            # model_reporters={"Gini": compute_gini}, agent_reporters={"Wealth": "wealth"}
+            model_reporters={
+                "Trash remaining": self.count_trash,
+                "Clean cells": self.get_cleaning_percentage,
+                "Dirty cells": self.get_dirty_percentage,
+                "Moves per agent": self.get_moves_per_agent,
+            },
         )
 
     def run_model(self):
@@ -78,6 +83,11 @@ class CleaningModel(mesa.Model):
     def get_cleaning_percentage(self): 
         total_cells = self.grid.width * self.grid.height
         return (total_cells - self.count_trash()) / total_cells * 100
+
+    def get_dirty_percentage(self):
+        total_cells = self.grid.width * self.grid.height
+        return self.count_trash() / total_cells * 100
+
 
     def get_total_moves(self):
         total_moves = 0

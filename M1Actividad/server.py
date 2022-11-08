@@ -3,8 +3,9 @@ import matplotlib.pyplot as plt
 import pandas as pd
 import numpy as np
 from model import *
+from portrayal import portrayal
 
-params = {"width": 10, "height": 10, "N": range(10, 500, 10)}
+# params = {"width": 10, "height": 10, "N": range(10, 500, 10)}
 
 # results = mesa.batch_run(
 #     CleaningModel,
@@ -19,32 +20,25 @@ params = {"width": 10, "height": 10, "N": range(10, 500, 10)}
 # results_df = pd.DataFrame(results)
 # print(results_df.keys())
 
-def portrayal(agent):
-    if isinstance(agent, Trash):
-        # Trash
-        portrayal = {"Shape": "circle",
-                    "Filled": "true",
-                    "r": 0.25, 
-                    "Color": "gray", 
-                    "Layer": 0}
-    else:
-        # VacuumCleaner
-        portrayal = {"Shape": "circle",
-                    "Filled": "true",
-                    "r": 0.5, 
-                    "Color": "blue", 
-                    "Layer": 1}
-
-    return portrayal
-
 grid = mesa.visualization.CanvasGrid(portrayal, 10, 10, 500, 500)
 
-chart = mesa.visualization.ChartModule([{"Label": "Gini",
-                      "Color": "Black"}],
-                    data_collector_name='datacollector')
+chart = mesa.visualization.ChartModule(
+    [{"Label": "Trash remaining", "Color": "Black"}],
+    data_collector_name='datacollector')
+
+chart_moves = mesa.visualization.BarChartModule(
+    [{"Label": "Moves per agent", "Color": "Black"}],
+    data_collector_name='datacollector')
+
+pie_chart = mesa.visualization.PieChartModule(
+    [{"Label": "Clean cells", "Color": "Blue"},
+    {"Label": "Dirty cells", "Color": "Gray"}],
+    data_collector_name='datacollector')
 
 server = mesa.visualization.ModularServer(
-    CleaningModel, [grid, chart], "Vacuum Cleaner Model", {"N": 20, "width": 10, "height": 10}
+    CleaningModel, [grid, chart, chart_moves, pie_chart], "Vacuum Cleaner Model", {"N": 20, "width": 10, "height": 10}
 )
 server.port = 8521  # The default
 server.launch()
+
+plt.show()
