@@ -4,9 +4,9 @@ from agents import *
 class CleaningModel(mesa.Model):
     """A model with some number of agents."""
 
-    def __init__(self, N, width, height):
-        self.num_trashes = N
-        self.num_vacuums = self.random.randrange(1, N/2)
+    def __init__(self, NT, NV, width, height):
+        self.num_trashes = NT
+        self.num_vacuums = NV
         self.grid = mesa.space.MultiGrid(width, height, True)
         self.schedule = mesa.time.RandomActivation(self)
         self.running = True
@@ -30,11 +30,15 @@ class CleaningModel(mesa.Model):
 
         self.datacollector = mesa.DataCollector(
             model_reporters={
-                "Trash remaining": self.count_trash,
-                "Clean cells": self.get_cleaning_percentage,
-                "Dirty cells": self.get_dirty_percentage,
-                "Moves per agent": self.get_moves_per_agent,
+                "Trash_remaining": self.count_trash,
+                "Clean_cells": self.get_cleaning_percentage,
+                "Dirty_cells": self.get_dirty_percentage,
             },
+
+            agent_reporters={
+                # "Vacuum": [agent.unique_id for agent in self.schedule.agents if isinstance(agent, VacuumCleaner)],
+                # "Trash_collected": lambda a: a.collected,
+            }
         )
 
     def run_model(self):
@@ -46,22 +50,24 @@ class CleaningModel(mesa.Model):
         # Si supera límite de pasos => terminar
         if self.schedule.steps + 1 > self.max_steps_running:
             self.running = False
-            print("Límite de pasos alcanzado")
-            print("Basura inicial: ", self.num_trashes)
-            print("Basura restante:",self.count_trash())
-            print("Porcentaje de limpieza:", self.get_cleaning_percentage(), "%")
-            print("Total de movimientos:",self.get_total_moves())
-            print("Total de movimientos por agentes:",self.get_moves_per_agent())
+            # print("Límite de pasos alcanzado")
+            # print("Número de aspiradoras: ", self.num_vacuums)
+            # print("Basura inicial: ", self.num_trashes)
+            # print("Basura restante:",self.count_trash())
+            # print("Porcentaje de limpieza:", self.get_cleaning_percentage(), "%")
+            # print("Total de movimientos:",self.get_total_moves())
+            # print("Total de movimientos por agentes:",self.get_moves_per_agent())
 
         # Si no hay más basura => terminar
         elif self.is_cleaned():
             self.running = False
-            print("Limpieza completa")
-            print("Basura inicial: ", self.num_trashes)
-            print("Basura restante:",self.count_trash())
-            print("Porcentaje de limpieza:", self.get_cleaning_percentage(), "%")
-            print("Total de movimientos:",self.get_total_moves())
-            print("Total de movimientos por agentes:",self.get_moves_per_agent())
+            # print("Limpieza completa")
+            # print("Número de aspiradoras: ", self.num_vacuums)
+            # print("Basura inicial: ", self.num_trashes)
+            # print("Basura restante:",self.count_trash())
+            # print("Porcentaje de limpieza:", self.get_cleaning_percentage(), "%")
+            # print("Total de movimientos:",self.get_total_moves())
+            # print("Total de movimientos por agentes:",self.get_moves_per_agent())
         else:
             self.schedule.step()
 
@@ -87,7 +93,6 @@ class CleaningModel(mesa.Model):
     def get_dirty_percentage(self):
         total_cells = self.grid.width * self.grid.height
         return self.count_trash() / total_cells * 100
-
 
     def get_total_moves(self):
         total_moves = 0

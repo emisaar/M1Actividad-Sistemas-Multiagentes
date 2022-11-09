@@ -13,6 +13,7 @@ class VacuumCleaner(mesa.Agent):
     def __init__(self, unique_id, model):
         super().__init__(unique_id, model)
         self.cleaned = 1
+        self.collected = 0
         self.move_count = 0
 
     def move(self):
@@ -29,4 +30,6 @@ class VacuumCleaner(mesa.Agent):
         for obj in cellmates:
             if (isinstance(obj, Trash)):
                 trash = obj
+                self.collected += 1
+                # print("Agente", self.unique_id, "recogió basura ", self.collected)
                 self.model.grid.remove_agent(trash)

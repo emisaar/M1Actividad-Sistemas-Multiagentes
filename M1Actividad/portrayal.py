@@ -1,4 +1,5 @@
 from agents import *
+
 def portrayal(agent):
     if isinstance(agent, Trash):
         # Trash
