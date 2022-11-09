@@ -21,4 +21,4 @@ server = mesa.visualization.ModularServer(
     CleaningModel, [grid, chart, pie_chart], "Vacuum Cleaner Model", {"NT": 20, "NV": 5, "width": 10, "height": 10, "max_steps": 30}
 )
 server.port = 8521  # The default
-# server.launch()
+server.launch()
