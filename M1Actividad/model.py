@@ -2,7 +2,6 @@ import mesa
 import matplotlib.pyplot as plt
 import pandas as pd
 import seaborn as sns
-import numpy as np
 
 from agents import *
 
@@ -155,8 +154,8 @@ print(grouped_iterations.to_string(
 #---- Plotting -----
 # Scatterplot de Iteración vs Porcentaje de celdas limpias
 # Consideraciones:
-    # NT =
-    # NV =
+    # NT = 50
+    # NV = 15
     # Para todas las iteraciones corridas del modelo
 sns.set_theme()
 sns.scatterplot(
@@ -166,7 +165,6 @@ sns.scatterplot(
 plt.show()
 
 # Scatterplot de basura restante vs número de aspiradoras
-
 df2 = pd.DataFrame()
 
 for i in range(10,100, 10):
@@ -214,7 +212,7 @@ print(df3.to_string(
 sns.set_theme()
 sns.barplot(
     data = df3,
-    x="iteration", y="Clean_cells", hue="NT"
+    x="NT", y="Clean_cells", hue="iteration"
 )
 plt.show()
 
