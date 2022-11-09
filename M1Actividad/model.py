@@ -1,16 +1,21 @@
 import mesa
+import matplotlib.pyplot as plt
+import pandas as pd
+import seaborn as sns
+import numpy as np
+
 from agents import *
 
 class CleaningModel(mesa.Model):
     """A model with some number of agents."""
 
-    def __init__(self, NT, NV, width, height):
+    def __init__(self, NT, NV, width, height, max_steps):
         self.num_trashes = NT
         self.num_vacuums = NV
         self.grid = mesa.space.MultiGrid(width, height, True)
         self.schedule = mesa.time.RandomActivation(self)
         self.running = True
-        self.max_steps_running = 30
+        self.max_steps_running = max_steps
 
         # Create VacuumCleaner agents
         for i in range(self.num_trashes):
@@ -48,7 +53,7 @@ class CleaningModel(mesa.Model):
     def step(self):
         self.datacollector.collect(self)
         # Si supera límite de pasos => terminar
-        if self.schedule.steps + 1 > self.max_steps_running:
+        if self.schedule.steps > self.max_steps_running:
             self.running = False
             # print("Límite de pasos alcanzado")
             # print("Número de aspiradoras: ", self.num_vacuums)
@@ -105,3 +110,161 @@ class CleaningModel(mesa.Model):
         for agent in self.schedule.agents:
             moves.append(agent.move_count)
         return moves
+
+# Parameters for running the model n times
+params = {
+    "width": 10, 
+    "height": 10, 
+    "NT": range(10, 51, 10),
+    "NV": range(5, 16, 5), 
+    "max_steps": 30
+    }
+
+# Using batch_run for running the model 100 times
+results = mesa.batch_run(
+    CleaningModel,
+    parameters=params,
+    iterations=100,
+    # max_steps=100,
+    number_processes=1,
+    data_collection_period=1,
+    display_progress=False,
+)
+
+# Convert results to pandas dataframe
+results_df = pd.DataFrame(results)
+print(results_df.keys())
+
+# Data is filtered to get only the data at the end of each simulation
+grouped_iterations = pd.DataFrame(columns=['iteration','NT', 'NV', 'Trash_remaining', 'Clean_cells', 'Dirty_cells'])
+for it, group in results_df.groupby(["iteration"]):
+    grouped_iterations = grouped_iterations.append(
+        {'iteration':group.iloc[-1].iteration, 
+        'NT':group.iloc[-1].NT, 
+        'NV':group.iloc[-1].NV, 
+        'Trash_remaining':group.iloc[-1].Trash_remaining,
+        'Clean_cells':group.iloc[-1].Clean_cells,
+        'Dirty_cells':group.iloc[-1].Dirty_cells}, 
+        ignore_index=True)
+# print(grouped_iterations.to_string(index=False, max_rows=25))
+print(grouped_iterations.to_string(
+    index=False, 
+    columns=['iteration', 'NT', 'NV', 'Clean_cells'],max_rows=10)
+    )
+
+#---- Plotting -----
+# Scatterplot de Iteración vs Porcentaje de celdas limpias
+# Consideraciones:
+    # NT =
+    # NV =
+    # Para todas las iteraciones corridas del modelo
+sns.set_theme()
+sns.scatterplot(
+    data = grouped_iterations,
+    x="iteration", y="Clean_cells",
+)
+plt.show()
+
+# Scatterplot de basura restante vs número de aspiradoras
+
+df2 = pd.DataFrame()
+
+for i in range(10,100, 10):
+    few_vacuums_df = results_df[(results_df.iteration == i) & (results_df.NV == 5)].tail(1)
+    mid_vacuums_df = results_df[(results_df.iteration == i) & (results_df.NV == 10)].tail(1)
+    many_vacuums_df = results_df[(results_df.iteration == i) & (results_df.NV == 15)].tail(1)
+    a = pd.concat([few_vacuums_df, mid_vacuums_df, many_vacuums_df])
+    df2 = df2.append(a)
+
+print(df2.to_string(
+    index=False, 
+    columns=['iteration', 'Step', 'NT', 'NV', 'Clean_cells', 'Dirty_cells'],max_rows=10)
+    )
+
+#---- Plotting -----
+# Consideraciones NV vs Clean_cells:
+    # NT = 50 (Para todos los casos)
+    # NV = 5, 10, 15
+
+sns.set_theme()
+sns.barplot(
+    data = df2,
+    x="NV", y="Clean_cells", hue="iteration"
+)
+plt.show()
+
+df3 = pd.DataFrame()
+
+for i in range(10,100, 10):
+    few_vacuums_df = results_df[(results_df.iteration == i) & (results_df.NT == 10)].tail(1)
+    mid_vacuums_df = results_df[(results_df.iteration == i) & (results_df.NT == 30)].tail(1)
+    many_vacuums_df = results_df[(results_df.iteration == i) & (results_df.NT == 50)].tail(1)
+    a = pd.concat([few_vacuums_df, mid_vacuums_df, many_vacuums_df])
+    df3 = df3.append(a)
+
+print(df3.to_string(
+    index=False, 
+    columns=['iteration', 'Step', 'NT', 'NV', 'Clean_cells', 'Dirty_cells'],max_rows=10)
+    )
+
+#---- Plotting -----
+# Consideraciones NT vs Clean_cells:
+    # NT = 10, 30, 50
+    # NV = 15 (Para todos los casos)
+sns.set_theme()
+sns.barplot(
+    data = df3,
+    x="iteration", y="Clean_cells", hue="NT"
+)
+plt.show()
+
+# Lineplot de Steps vs Clean_cells
+df4 = pd.DataFrame()
+for i in range(10,110, 25):
+    few_vacuums_df = results_df[(results_df.iteration == i) & (results_df.NV == 5) & (results_df.NT == 30)]
+    mid_vacuums_df = results_df[(results_df.iteration == i) & (results_df.NV == 10) & (results_df.NT == 30)]
+    many_vacuums_df = results_df[(results_df.iteration == i) & (results_df.NV == 15) & (results_df.NT == 30)]
+    a = pd.concat([few_vacuums_df, mid_vacuums_df, many_vacuums_df])
+    df4 = df4.append(a)
+
+print(df4.to_string(
+    index=False, 
+    columns=['iteration', 'Step', 'NT', 'NV', 'Clean_cells', 'Dirty_cells'],max_rows=10)
+    )
+
+#---- Plotting -----
+# Consideraciones:
+    # NT = 30 (Para todos los casos)
+    # NV = 5, 10, 15
+sns.set_theme()
+sns.lineplot(
+    data = df4,
+    x="Step", y="Clean_cells", hue="NV"
+)
+plt.show()
+
+df5 = pd.DataFrame()
+for i in range(10,110, 25):
+    few_vacuums_df = results_df[(results_df.iteration == i) & (results_df.NV == 5) & (results_df.NT == 30) & (results_df.Step == 30)].tail(1)
+    mid_vacuums_df = results_df[(results_df.iteration == i) & (results_df.NV == 10) & (results_df.NT == 30) & (results_df.Step == 30)].tail(1)
+    many_vacuums_df = results_df[(results_df.iteration == i) & (results_df.NV == 15) & (results_df.NT == 30) & (results_df.Step == 30)].tail(1)
+    a = pd.concat([few_vacuums_df, mid_vacuums_df, many_vacuums_df])
+    df5 = df5.append(a)
+
+print(df5.to_string(
+    index=False, 
+    columns=['iteration', 'Step', 'NT', 'NV', 'Clean_cells', 'Dirty_cells'],max_rows=10)
+    )
+
+# Barplot de Clean_cells vs Iteration (Steps necesarios para limpiar o que se acabe el tiempo)
+#---- Plotting -----
+# Consideraciones:
+    # NT = 30 (Para todos los casos)
+    # NV = 5, 10, 15
+
+sns.set_theme()
+sns.barplot(
+    data = df5,
+    x="iteration", y="Clean_cells", hue="NV"
+)
+plt.show()
