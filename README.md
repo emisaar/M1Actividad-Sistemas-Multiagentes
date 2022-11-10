@@ -1,4 +1,4 @@
-# M1.Acividad
+# M1.Actividad
 # Propósito 
 Conocer y aplicar una herramienta para la implementación de sistemas multiagentes.
 
