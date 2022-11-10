@@ -54,6 +54,7 @@ class CleaningModel(mesa.Model):
         # Si supera límite de pasos => terminar
         if self.schedule.steps > self.max_steps_running:
             self.running = False
+        # ------------ DESCOMENTAR PARA OBTENER INFO. ADICIONAL ------------
             # print("Límite de pasos alcanzado")
             # print("Número de aspiradoras: ", self.num_vacuums)
             # print("Basura inicial: ", self.num_trashes)
@@ -65,6 +66,7 @@ class CleaningModel(mesa.Model):
         # Si no hay más basura => terminar
         elif self.is_cleaned():
             self.running = False
+        # ------------ DESCOMENTAR PARA OBTENER INFO. ADICIONAL ------------
             # print("Limpieza completa")
             # print("Número de aspiradoras: ", self.num_vacuums)
             # print("Basura inicial: ", self.num_trashes)
@@ -152,7 +154,7 @@ print(grouped_iterations.to_string(
     )
 
 #---- Plotting -----
-# Scatterplot de Iteración vs Porcentaje de celdas limpias
+# 1. Scatterplot de Iteración vs Porcentaje de celdas limpias
 # Consideraciones:
     # NT = 50
     # NV = 15
@@ -164,7 +166,7 @@ sns.scatterplot(
 )
 plt.show()
 
-# Scatterplot de basura restante vs número de aspiradoras
+# 2. Barplot de basura restante vs número de aspiradoras
 df2 = pd.DataFrame()
 
 for i in range(10,100, 10):
@@ -216,7 +218,7 @@ sns.barplot(
 )
 plt.show()
 
-# Lineplot de Steps vs Clean_cells
+# 3. Lineplot de Steps vs Clean_cells
 df4 = pd.DataFrame()
 for i in range(10,110, 25):
     few_vacuums_df = results_df[(results_df.iteration == i) & (results_df.NV == 5) & (results_df.NT == 30)]
@@ -254,12 +256,11 @@ print(df5.to_string(
     columns=['iteration', 'Step', 'NT', 'NV', 'Clean_cells', 'Dirty_cells'],max_rows=10)
     )
 
-# Barplot de Clean_cells vs Iteration (Steps necesarios para limpiar o que se acabe el tiempo)
+# 4. Barplot de Clean_cells vs Iteration (Steps necesarios para limpiar o que se acabe el tiempo)
 #---- Plotting -----
 # Consideraciones:
     # NT = 30 (Para todos los casos)
     # NV = 5, 10, 15
-
 sns.set_theme()
 sns.barplot(
     data = df5,
