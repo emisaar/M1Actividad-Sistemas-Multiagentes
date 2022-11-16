@@ -2,7 +2,8 @@ import mesa
 import random
 from agents import *
 
-lights_positions = [ (12, 12), (9, 12), (9, 9), (12, 9)] # 1, 2, 3, 4
+lights_positions = [(12, 12), (9, 12), (9, 9), (12, 9)] # 1, 2, 3, 4
+directions = ['right', 'left', 'up', 'down']
 vehicle_start_positions = {'right': (21, 11), 'left': (0, 10), 'up': (10, 21), 'down': (11, 0)}
 flags = [(15, 11), (10, 15), (6, 10), (11, 6)] # 1, 2, 3, 4
 class Intersection_Model(mesa.Model):
@@ -27,15 +28,31 @@ class Intersection_Model(mesa.Model):
             self.schedule.step()
             # Check if there are any vehicles in the intersection
             for i in range(len(flags)):
-                if not self.is_Vehicle(flags[i]):
-                    self.schedule.agents[i].state = 0 # Yellow
+                if self.schedule.agents[i].initiate == False:
+                    if not self.is_Vehicle(flags[i]):
+                        self.schedule.agents[i].state = 0 # Yellow
+                    else:
+                        self.schedule.agents[i].state = 1 # Green
+                        self.schedule.agents[i].initiate = True
+                        for j in range(len(flags)):
+                            if j != i:
+                                print(i, "diff", j)
+                                self.schedule.agents[j].state = 2 # Red
+                                self.schedule.agents[j].initiate = True
+                                temp = i
+                        break
                 else:
-                    self.schedule.agents[i].state = 1 # Green
-                    for j in range(len(flags)):
-                        if j != i:
-                            print(i, "diff", j)
-                            self.schedule.agents[j].state = 2 # Red
+                    pass
+            for i in range(4):
+                if(self.schedule.agents[i].state == 2):
+                    # print("Stop")
+                    self.schedule.agents[i + 4].stop_flag = True
+                else:
+                    self.schedule.agents[i + 4].stop_flag = False
+                # print(self.schedule.steps)
+            
 
+                
     def is_Vehicle(self, pos):
         agents = self.grid.get_cell_list_contents([pos])
         for agent in agents:
@@ -44,27 +61,16 @@ class Intersection_Model(mesa.Model):
         return False
 
     def createVehicles(self):
-        temp = random.randint(0, 99)
-        direction = ""
-        dist = [25, 50, 75, 100]
-
-        if(temp < dist[0]):
-            direction = 'right'
-        elif(temp < dist[1]):
-            direction = 'left'
-        elif(temp < dist[2]):
-            direction = 'up'
-        else:
-            direction = 'down'
-
-        vehicle = Vehicle(self, self, direction)
-        self.schedule.add(vehicle)
-        self.grid.place_agent(vehicle, vehicle_start_positions[direction])
+        for i in range(4):
+            speed = random.randint(1,3)
+            vehicle = Vehicle(i, self, directions[i], speed)
+            self.schedule.add(vehicle)
+            self.grid.place_agent(vehicle, vehicle_start_positions[directions[i]])
 
     def createStreet(self):
         # Create Traffic_Light agents
         for i in range(self.num_traffic_lights):
-            traffic_light = Traffic_Light(i, self)
+            traffic_light = Traffic_Light(i + 10, self)
             self.schedule.add(traffic_light)
             self.grid.place_agent(traffic_light, lights_positions[i])
 
@@ -85,3 +91,6 @@ class Intersection_Model(mesa.Model):
             self.grid.place_agent(sidewalk, (13 + i, 9))
 
         self.createVehicles()
+    
+        # for i in range(len(self.schedule.agents)):
+        #     print(self.schedule.agents[i].unique_id)

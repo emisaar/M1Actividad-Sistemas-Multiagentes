@@ -15,7 +15,7 @@ def portrayal(agent):
                         "r": 0.25, 
                         "Color": "blue", 
                         "Layer": 0}
-        else:
+        elif agent.state == 2:
             portrayal = {"Shape": "img/lights/red_light.png",
                         "Filled": "true",
                         "r": 0.25, 
