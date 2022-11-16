@@ -1,4 +1,5 @@
 import mesa
+import random
 
 class Traffic_Light(mesa.Agent):
 
@@ -9,22 +10,27 @@ class Traffic_Light(mesa.Agent):
         self.initiate = False
     
     def step(self):
+        randLight = random.randint(10,13)
         if(self.initiate == True):
             self.time += 1
             if(self.state == 1 and self.time == 2): 
                 self.state = 0 # Yellow
             if(self.state == 0 and self.time == 4):
+                print("ID: ", self.unique_id, "State: ", self.state)
                 self.state = 2 # Red
                 self.time = 0
+                temp_id = self.unique_id
+                print("Temp_id: ", temp_id)
             if(self.state == 2 and self.time == 2):
                 self.state = 2 # Red
             if(self.state == 2 and self.time == 4):
                 self.state = 1 # Green
+                # self.state = 1 # Green
                 self.time = 0
                 
         
-        print("State", self.state)
-        print("Time", self.time)
+        # print("State", self.state)
+        # print("Time", self.time)
         
 
 class Vehicle(mesa.Agent):
@@ -60,7 +66,7 @@ class Vehicle(mesa.Agent):
         if self.stop_flag == False:
             self.move()
         else:
-            print("Stop moving")
+            # print("Stop moving")
             self.stop()
 
 class Sidewalk(mesa.Agent):

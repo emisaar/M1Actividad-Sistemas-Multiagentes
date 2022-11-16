@@ -36,20 +36,46 @@ class Intersection_Model(mesa.Model):
                         self.schedule.agents[i].initiate = True
                         for j in range(len(flags)):
                             if j != i:
-                                print(i, "diff", j)
+                                # print(i, "diff", j)
                                 self.schedule.agents[j].state = 2 # Red
                                 self.schedule.agents[j].initiate = True
-                                temp = i
                         break
                 else:
                     pass
-            for i in range(4):
-                if(self.schedule.agents[i].state == 2):
-                    # print("Stop")
-                    self.schedule.agents[i + 4].stop_flag = True
-                else:
-                    self.schedule.agents[i + 4].stop_flag = False
-                # print(self.schedule.steps)
+           
+            # directions = ['right', 'left', 'up', 'down']
+            # lights_positions = [(12, 12), (9, 12), (9, 9), (12, 9)]
+            # RIGHT VEHICLE
+            x, y = self.schedule.agents[4].pos
+            if(self.schedule.agents[0].state == 2 and x <= 13 and x >= 12):
+                print("Stop")
+                self.schedule.agents[4].stop_flag = True
+            else:
+                self.schedule.agents[4].stop_flag = False
+
+            # LEFT VEHICLE
+            x, y = self.schedule.agents[5].pos
+            if(self.schedule.agents[2].state == 2 and x >= 8 and x <= 9):
+                print("Stop")
+                self.schedule.agents[5].stop_flag = True
+            else:
+                self.schedule.agents[5].stop_flag = False
+
+            # UP VEHICLE
+            x, y = self.schedule.agents[6].pos
+            if(self.schedule.agents[1].state == 2 and y <= 13 and y >= 12):
+                print("Stop")
+                self.schedule.agents[6].stop_flag = True
+            else:
+                self.schedule.agents[6].stop_flag = False
+
+            # DOWN VEHICLE
+            x, y = self.schedule.agents[7].pos
+            if(self.schedule.agents[3].state == 2 and y >= 8 and y <= 9):
+                print("Stop")
+                self.schedule.agents[7].stop_flag = True
+            else:
+                self.schedule.agents[7].stop_flag = False
             
 
                 
