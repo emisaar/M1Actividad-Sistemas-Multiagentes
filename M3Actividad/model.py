@@ -14,6 +14,7 @@ class Intersection_Model(mesa.Model):
         self.num_traffic_lights = 4
         self.grid = mesa.space.MultiGrid(width, height, True)
         self.schedule = mesa.time.RandomActivation(self)
+        self.prev_green = 10
 
         self.createStreet()
     
@@ -34,14 +35,34 @@ class Intersection_Model(mesa.Model):
                     else:
                         self.schedule.agents[i].state = 1 # Green
                         self.schedule.agents[i].initiate = True
+                        self.prev_green = self.schedule.agents[i].unique_id 
+                        
                         for j in range(len(flags)):
                             if j != i:
-                                # print(i, "diff", j)
                                 self.schedule.agents[j].state = 2 # Red
                                 self.schedule.agents[j].initiate = True
                         break
                 else:
                     pass
+
+            print("prev_green",self.prev_green)
+            # Decide next green traffic light
+            if(self.schedule.agents[0].state == 1 and self.schedule.agents[0].unique_id == self.prev_green):
+                self.schedule.agents[0].next_green = False
+                self.schedule.agents[1].next_green = True
+                self.prev_green = 11
+            elif(self.schedule.agents[1].state == 1 and self.schedule.agents[1].unique_id == self.prev_green):
+                self.schedule.agents[1].next_green = False
+                self.schedule.agents[2].next_green = True
+                self.prev_green = 12
+            elif(self.schedule.agents[2].state == 1 and self.schedule.agents[2].unique_id == self.prev_green):
+                self.schedule.agents[2].next_green = False
+                self.schedule.agents[3].next_green = True
+                self.prev_green = 13
+            elif(self.schedule.agents[3].state == 1 and self.schedule.agents[3].unique_id == self.prev_green):
+                self.schedule.agents[3].next_green = False
+                self.schedule.agents[0].next_green = True
+                self.prev_green = 10
            
             # directions = ['right', 'left', 'up', 'down']
             # lights_positions = [(12, 12), (9, 12), (9, 9), (12, 9)]

@@ -8,23 +8,23 @@ class Traffic_Light(mesa.Agent):
         self.state = 0
         self.time = 0
         self.initiate = False
+        self.next_green = False
     
     def step(self):
         randLight = random.randint(10,13)
         if(self.initiate == True):
             self.time += 1
-            if(self.state == 1 and self.time == 2): 
+            if(self.state == 1 and self.time == 3): 
                 self.state = 0 # Yellow
-            if(self.state == 0 and self.time == 4):
-                print("ID: ", self.unique_id, "State: ", self.state)
+            if(self.state == 0 and self.time == 6):
                 self.state = 2 # Red
                 self.time = 0
-                temp_id = self.unique_id
-                print("Temp_id: ", temp_id)
-            if(self.state == 2 and self.time == 2):
+            if(self.state == 2 and self.time == 3):
                 self.state = 2 # Red
-            if(self.state == 2 and self.time == 4):
-                self.state = 1 # Green
+            if(self.state == 2 and self.time == 6):
+                if self.next_green == True:
+                    self.state = 1
+                # self.state = 1 # Green
                 # self.state = 1 # Green
                 self.time = 0
                 
