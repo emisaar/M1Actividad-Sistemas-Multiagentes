@@ -24,11 +24,41 @@ def portrayal(agent):
                         
     elif isinstance(agent, Vehicle):
         # Car
+        if agent.direction == 'right':
+            portrayal = {"Shape": "circle",
+                        "Filled": "true",
+                        "r": 0.5, 
+                        "Color": "blue", 
+                        "Layer": 1}
+
+        elif agent.direction == 'left':
+            portrayal = {"Shape": "circle",
+                        "Filled": "true",
+                        "r": 0.5, 
+                        "Color": "green", 
+                        "Layer": 1}
+        
+        elif agent.direction == 'up':
+            portrayal = {"Shape": "circle",
+                        "Filled": "true",
+                        "r": 0.5, 
+                        "Color": "purple", 
+                        "Layer": 1}
+        
+        else:
+            portrayal = {"Shape": "circle",
+                        "Filled": "true",
+                        "r": 0.5, 
+                        "Color": "orange", 
+                        "Layer": 1}
+
+    elif isinstance(agent, Collision):
+        # Collision
         portrayal = {"Shape": "circle",
                     "Filled": "true",
                     "r": 0.5, 
-                    "Color": "gray", 
-                    "Layer": 1}
+                    "Color": "red", 
+                    "Layer": 2}
     else:
         # Sidewalk
         portrayal = {"Shape": "circle",
@@ -36,4 +66,5 @@ def portrayal(agent):
                     "r": 0.1, 
                     "Color": "black", 
                     "Layer": 0}
+
     return portrayal

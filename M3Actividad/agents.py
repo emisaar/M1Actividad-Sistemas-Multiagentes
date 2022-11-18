@@ -2,7 +2,6 @@ import mesa
 import random
 
 class Traffic_Light(mesa.Agent):
-
     def __init__(self, unique_id, model):
         super().__init__(unique_id, model)
         self.state = 0
@@ -11,7 +10,6 @@ class Traffic_Light(mesa.Agent):
         self.next_green = False
     
     def step(self):
-        randLight = random.randint(10,13)
         if(self.initiate == True):
             self.time += 1
             if(self.state == 1 and self.time == 3): 
@@ -69,17 +67,12 @@ class Vehicle(mesa.Agent):
             # print("Stop moving")
             self.stop()
 
-class Sidewalk(mesa.Agent):
+                
 
+class Sidewalk(mesa.Agent):
     def __init__(self, unique_id, model):
         super().__init__(unique_id, model)
-        self.state = 0
-        self.time = 0
 
-    def step(self):
-        self.time += 1
-        if self.time == 10:
-            self.state = 1
-        if self.time == 20:
-            self.state = 0
-            self.time = 0
+class Collision(mesa.Agent):
+    def __init__(self, unique_id, model):
+        super().__init__(unique_id, model)
